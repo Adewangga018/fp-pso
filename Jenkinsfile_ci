@@ -2,12 +2,15 @@ pipeline {
     agent any
 
     environment {
-        DB_HOST = "mysql"
-        DB_PORT = "3306"
-        DB_DATABASE = "perpus"
-        DB_USERNAME = "root"
-        DB_PASSWORD = "12345678"
-    }
+    DB_HOST = "mysql"
+    DB_PORT = "3306"
+    DB_DATABASE = "perpus"
+    DB_USERNAME = "root"
+    DB_PASSWORD = "12345678"
+
+    DOCKER_IMAGE = "nurghulam/laravel-app"
+    DOCKER_TAG = "latest"
+}
 
     stages {
         stage('Checkout') {
@@ -40,6 +43,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
                     sh '''
                         echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USER" --password-stdin
+                        docker tag laravel-app $DOCKER_IMAGE:$DOCKER_TAG
                         docker push $DOCKER_IMAGE:$DOCKER_TAG
                         docker logout
                     '''
